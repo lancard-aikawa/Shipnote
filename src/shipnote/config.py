@@ -53,6 +53,7 @@ class ProjectConfig:
     screenshots: list[str]  # リポジトリ内のパス
     platforms: str
     listed: bool
+    posts: bool = True  # false なら一覧と LP だけ。リリース記録 (/posts/) は作らない
 
 
 SLUG_RE = re.compile(r"^[a-z0-9][a-z0-9-]*$")
@@ -86,6 +87,7 @@ def load_project(repo: Path, github: str) -> ProjectConfig:
         screenshots=[str(s) for s in data.get("screenshots", [])],
         platforms=str(data.get("platforms", "")).strip(),
         listed=bool(data.get("listed", True)),
+        posts=bool(data.get("posts", True)),
     )
 
 
@@ -122,4 +124,7 @@ screenshots = []
 
 # false にするとトップの一覧から外す (LP とリリース記録は作る)
 listed = true
+
+# false にすると一覧と LP だけ載せ、リリース記録 (/posts/) は作らない (作ってあったものは消す)
+posts = true
 """

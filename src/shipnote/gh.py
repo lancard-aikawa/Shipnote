@@ -23,8 +23,20 @@ def git(repo: Path, *args: str, check: bool = True) -> str:
 GITHUB_RE = re.compile(r"github\.com[:/]([^/]+)/([^/]+?)(?:\.git)?/?$")
 
 
+def check_remotes(repo: Path, remotes: str) -> None:
+    """remote が 1 つでも GitHub 以外 (Gogs など) なら止める。
+
+    Gogs のリポジトリは機密を含むので、origin が GitHub でも混ざっていたら材料にしない。
+    ``remotes`` は ``git remote -v`` の出力。
+    """
+    others = sorted({ln.split()[1] for ln in remotes.splitlines() if ln.strip() and "github.com" not in ln.split()[1]})
+    if others:
+        raise ValueError(f"{repo} に GitHub 以外の remote があります。載せません ({', '.join(others)})")
+
+
 def github_of(repo: Path) -> str:
-    """origin の URL から owner/name を取る。"""
+    """origin の URL から owner/name を取る。GitHub 以外の remote があれば例外。"""
+    check_remotes(repo, git(repo, "remote", "-v", check=False))
     url = git(repo, "remote", "get-url", "origin", check=False).strip()
     m = GITHUB_RE.search(url)
     if not m:

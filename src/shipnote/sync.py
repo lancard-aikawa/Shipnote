@@ -132,12 +132,12 @@ def sync(proj: ProjectConfig, repo: Path, site: Path, dry: bool = False) -> Sync
 
     posts_dir = site / "src/content/posts"
     keep = set()
-    for rel in rels:
+    for rel in rels if proj.posts else []:
         path = posts_dir / f"{post_slug(proj.slug, rel.tag)}.md"
         keep.add(path.name)
         _write(path, render_post(proj, rel), res, dry)
 
-    # Release を消したら記録も消す (shipnote が作ったものに限る)
+    # Release を消したら (posts = false にしたら) 記録も消す (shipnote が作ったものに限る)
     if posts_dir.exists():
         marker = f"project: {yaml_str(proj.slug)}"
         for path in posts_dir.glob(f"{proj.slug}-*.md"):

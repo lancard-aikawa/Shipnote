@@ -66,7 +66,15 @@ repos = [
 
 ### プロジェクトごと `shipnote.toml`
 
-`shipnote init` が作ります。`tagline`（一行）、`description`、`features`、`platforms`、`screenshots`（リポジトリ内の画像のパス）、`listed`（トップの一覧に出すか）。
+`shipnote init` が作ります。`tagline`（一行）、`description`、`features`、`platforms`、`screenshots`（リポジトリ内の画像のパス）、`listed`（トップの一覧に出すか）、`posts`（リリース記録を作るか）。
+
+これまでに Release を出したプロジェクトを、記録は出さずに「作ったもの」の一覧と LP にだけ載せるときは `posts = false` にします。
+LP のダウンロード欄は最新の Release のままです。作ってあった記録は次の `sync` で消えます。
+
+### 載せないもの
+
+非公開のリポジトリと、remote が 1 つでも GitHub 以外（Gogs など）のリポジトリは、`init` / `sync` / `story` のどれもエラーで止まります。
+Gogs のリポジトリは機密を含むので、origin が GitHub でも Gogs の remote が混ざっていたら材料にしません。
 
 ## 開発
 

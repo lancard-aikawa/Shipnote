@@ -1,4 +1,5 @@
 import tomllib
+from pathlib import Path
 
 import pytest
 
@@ -47,3 +48,27 @@ def test_story_forces_unpublished_and_links():
 def test_story_rejects_short_body():
     with pytest.raises(ValueError):
         render(PROJ, {"title": "t", "body": "短い"})
+
+
+def test_remotes_reject_gogs_even_with_github_origin():
+    from shipnote.gh import check_remotes
+    ok = "origin\thttps://github.com/o/X.git (fetch)\norigin\thttps://github.com/o/X.git (push)\n"
+    check_remotes(Path("X"), ok)
+    with pytest.raises(ValueError, match="gogs"):
+        check_remotes(Path("X"), ok + "backup\thttps://gogs.example.com/a/X.git (fetch)\n")
+
+
+def test_posts_false_writes_card_only_and_removes_old_posts(tmp_path, monkeypatch):
+    from shipnote import gh, sync as s
+    rel = gh.Release(tag="v1.0.0", name="X 1.0.0", body="- a", url="u", published_at="2026-09-01T00:00:00Z",
+                     prerelease=False, assets=[])
+    monkeypatch.setattr(gh, "repo_info", lambda g: {"isPrivate": False})
+    monkeypatch.setattr(gh, "releases", lambda g: [rel])
+    proj = ProjectConfig(**{**PROJ.__dict__, "posts": False})
+    old = tmp_path / "src/content/posts/repotether-v1-0-0.md"
+    old.parent.mkdir(parents=True)
+    old.write_text(s.render_post(PROJ, rel), encoding="utf-8")
+    res = s.sync(proj, tmp_path, tmp_path)
+    assert [p.name for p in res.written] == ["repotether.json"]
+    assert res.removed == [old] and not old.exists()
+    assert '"tag": "v1.0.0"' in (tmp_path / "src/content/projects/repotether.json").read_text(encoding="utf-8")
