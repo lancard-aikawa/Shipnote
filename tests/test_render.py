@@ -72,3 +72,15 @@ def test_posts_false_writes_card_only_and_removes_old_posts(tmp_path, monkeypatc
     assert [p.name for p in res.written] == ["repotether.json"]
     assert res.removed == [old] and not old.exists()
     assert '"tag": "v1.0.0"' in (tmp_path / "src/content/projects/repotether.json").read_text(encoding="utf-8")
+
+
+def test_claude_flag_reaches_card_and_defaults_off(tmp_path):
+    import json
+    from shipnote.config import load_project
+    from shipnote.sync import render_project
+    (tmp_path / "shipnote.toml").write_text(render_project_toml(
+        name="X", github="o/X", tagline="t", description="", features=[], platforms=""), encoding="utf-8")
+    assert load_project(tmp_path, "o/X").claude is False
+    proj = ProjectConfig(**{**PROJ.__dict__, "claude": True})
+    text, _ = render_project(proj, tmp_path, {}, [])
+    assert json.loads(text)["claude"] is True

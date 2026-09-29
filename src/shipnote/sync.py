@@ -88,6 +88,7 @@ def render_project(proj: ProjectConfig, repo: Path, info: dict, rels: list[gh.Re
         "screenshots": shots,
         "license": ((info.get("licenseInfo") or {}).get("spdxId") or ""),
         "listed": proj.listed,
+        "claude": proj.claude,
         "latest": None if latest is None else {
             "tag": latest.tag,
             "name": latest.name,

@@ -12,6 +12,7 @@ GitHub の Release を材料に、次の 2 つを作る個人用の CLI です�
 | 出し先 | 中身 | 作り方 |
 |---|---|---|
 | Pages `/projects/<slug>/` | 紹介・特徴・ダウンロード | `shipnote.toml`（人が直したもの）と最新の Release |
+| Pages `/claudes/` | Claude Code 前提のものの一覧 | `shipnote.toml` の `claude = true` |
 | Pages `/posts/<slug>-<tag>/` | その版の変更点 | Release の本文そのまま（LLM は使わない） |
 | Zenn | なぜ作ったか・どう作ったか | `claude -p` が下書きし、人が読んで公開 |
 
@@ -66,10 +67,14 @@ repos = [
 
 ### プロジェクトごと `shipnote.toml`
 
-`shipnote init` が作ります。`tagline`（一行）、`description`、`features`、`platforms`、`screenshots`（リポジトリ内の画像のパス）、`listed`（トップの一覧に出すか）、`posts`（リリース記録を作るか）。
+`shipnote init` が作ります。`tagline`（一行）、`description`、`features`、`platforms`、`screenshots`（リポジトリ内の画像のパス）、`listed`（一覧に出すか）、`posts`（リリース記録を作るか）、`claude`（Claude Code 前提か）。
 
 これまでに Release を出したプロジェクトを、記録は出さずに「作ったもの」の一覧と LP にだけ載せるときは `posts = false` にします。
 LP のダウンロード欄は最新の Release のままです。作ってあった記録は次の `sync` で消えます。
+
+Claude Code に頼んで動かす前提のもの（単体では動かないもの）は `claude = true` にします。
+「作ったもの」（トップと `/projects/`）から外れて、`/claudes/` の一覧に載ります。LP は同じ `/projects/<slug>/` で、
+Claude Code が必要なことを書き添えます。Release が無くても載せられます。
 
 ### 載せないもの
 

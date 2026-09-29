@@ -54,6 +54,7 @@ class ProjectConfig:
     platforms: str
     listed: bool
     posts: bool = True  # false なら一覧と LP だけ。リリース記録 (/posts/) は作らない
+    claude: bool = False  # Claude Code 前提。「作ったもの」ではなく /claudes/ の一覧に載せる
 
 
 SLUG_RE = re.compile(r"^[a-z0-9][a-z0-9-]*$")
@@ -88,6 +89,7 @@ def load_project(repo: Path, github: str) -> ProjectConfig:
         platforms=str(data.get("platforms", "")).strip(),
         listed=bool(data.get("listed", True)),
         posts=bool(data.get("posts", True)),
+        claude=bool(data.get("claude", False)),
     )
 
 
@@ -127,4 +129,7 @@ listed = true
 
 # false にすると一覧と LP だけ載せ、リリース記録 (/posts/) は作らない (作ってあったものは消す)
 posts = true
+
+# true にすると Claude Code 前提のものとして、「作ったもの」ではなく /claudes/ の一覧に載せる
+claude = false
 """
