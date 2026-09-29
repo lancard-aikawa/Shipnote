@@ -67,7 +67,7 @@ repos = [
 
 ### プロジェクトごと `shipnote.toml`
 
-`shipnote init` が作ります。`tagline`（一行）、`description`、`features`、`platforms`、`screenshots`（リポジトリ内の画像のパス）、`listed`（一覧に出すか）、`posts`（リリース記録を作るか）、`claude`（Claude Code 前提か）。
+`shipnote init` が作ります。`tagline`（一行）、`description`、`features`、`platforms`、`screenshots`（リポジトリ内の画像のパス）、`listed`（一覧に出すか）、`posts`（リリース記録を作るか）、`claude`（Claude Code 前提か）、`links`（LP に並べるリンク。ギャラリーなど）。
 
 これまでに Release を出したプロジェクトを、記録は出さずに「作ったもの」の一覧と LP にだけ載せるときは `posts = false` にします。
 LP のダウンロード欄は最新の Release のままです。作ってあった記録は次の `sync` で消えます。

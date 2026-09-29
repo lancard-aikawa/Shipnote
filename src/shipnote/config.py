@@ -55,6 +55,7 @@ class ProjectConfig:
     listed: bool
     posts: bool = True  # false なら一覧と LP だけ。リリース記録 (/posts/) は作らない
     claude: bool = False  # Claude Code 前提。「作ったもの」ではなく /claudes/ の一覧に載せる
+    links: list[dict[str, str]] = field(default_factory=list)  # LP に並べるリンク [{label, url}]
 
 
 SLUG_RE = re.compile(r"^[a-z0-9][a-z0-9-]*$")
@@ -76,6 +77,12 @@ def load_project(repo: Path, github: str) -> ProjectConfig:
     if not SLUG_RE.match(slug):
         raise ValueError(f"{path}: slug は英小文字・数字・ハイフンだけにしてください ({slug!r})")
     tagline = str(data.get("tagline", "")).strip()
+    links = []
+    for ln in data.get("links", []):
+        label, url = str(ln.get("label", "")).strip(), str(ln.get("url", "")).strip()
+        if not label or not url.startswith("https://"):
+            raise ValueError(f"{path}: links は label と https:// の url を書いてください ({ln!r})")
+        links.append({"label": label, "url": url})
     if not tagline:
         raise ValueError(f"{path}: tagline が空です")
     return ProjectConfig(
@@ -90,6 +97,7 @@ def load_project(repo: Path, github: str) -> ProjectConfig:
         listed=bool(data.get("listed", True)),
         posts=bool(data.get("posts", True)),
         claude=bool(data.get("claude", False)),
+        links=links,
     )
 
 
@@ -132,4 +140,9 @@ posts = true
 
 # true にすると Claude Code 前提のものとして、「作ったもの」ではなく /claudes/ の一覧に載せる
 claude = false
+
+# LP の「GitHub で見る」の横に並べるリンク (ギャラリー、動画など)
+# links = [
+#   {{ label = "ギャラリー", url = "https://..." }},
+# ]
 """

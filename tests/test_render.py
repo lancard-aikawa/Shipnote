@@ -84,3 +84,14 @@ def test_claude_flag_reaches_card_and_defaults_off(tmp_path):
     proj = ProjectConfig(**{**PROJ.__dict__, "claude": True})
     text, _ = render_project(proj, tmp_path, {}, [])
     assert json.loads(text)["claude"] is True
+
+
+def test_links_need_label_and_https(tmp_path):
+    from shipnote.config import load_project
+    base = render_project_toml(name="X", github="o/X", tagline="t", description="", features=[], platforms="")
+    f = tmp_path / "shipnote.toml"
+    f.write_text(base + 'links = [{ label = "ギャラリー", url = "https://e.example/" }]\n', encoding="utf-8")
+    assert load_project(tmp_path, "o/X").links == [{"label": "ギャラリー", "url": "https://e.example/"}]
+    f.write_text(base + 'links = [{ label = "x", url = "javascript:alert(1)" }]\n', encoding="utf-8")
+    with pytest.raises(ValueError, match="links"):
+        load_project(tmp_path, "o/X")
