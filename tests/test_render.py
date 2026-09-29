@@ -86,6 +86,13 @@ def test_claude_flag_reaches_card_and_defaults_off(tmp_path):
     assert json.loads(text)["claude"] is True
 
 
+def test_japanese_name_takes_slug_from_repo(tmp_path):
+    from shipnote.config import load_project
+    (tmp_path / "shipnote.toml").write_text(render_project_toml(
+        name="今日はここに", github="o/kyokoko", tagline="t", description="", features=[], platforms=""), encoding="utf-8")
+    assert load_project(tmp_path, "o/kyokoko").slug == "kyokoko"
+
+
 def test_links_need_label_and_https(tmp_path):
     from shipnote.config import load_project
     base = render_project_toml(name="X", github="o/X", tagline="t", description="", features=[], platforms="")

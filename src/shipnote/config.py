@@ -73,7 +73,9 @@ def load_project(repo: Path, github: str) -> ProjectConfig:
         raise FileNotFoundError(f"{path} がありません。先に `shipnote init {repo}` で作ってください")
     data = tomllib.loads(path.read_text(encoding="utf-8"))
     name = data.get("name") or repo.name
-    slug = data.get("slug") or slugify(name)
+    github = data.get("github") or github
+    # 日本語だけの名前 (例: 今日はここに) からは slug が作れない。"project" で衝突させずにリポジトリ名を使う
+    slug = data.get("slug") or slugify(name if re.search(r"[A-Za-z0-9]", name) else github.split("/")[-1])
     if not SLUG_RE.match(slug):
         raise ValueError(f"{path}: slug は英小文字・数字・ハイフンだけにしてください ({slug!r})")
     tagline = str(data.get("tagline", "")).strip()
@@ -88,7 +90,7 @@ def load_project(repo: Path, github: str) -> ProjectConfig:
     return ProjectConfig(
         name=name,
         slug=slug,
-        github=data.get("github") or github,
+        github=github,
         tagline=tagline,
         description=str(data.get("description", "")).strip(),
         features=[str(f).strip() for f in data.get("features", []) if str(f).strip()],
